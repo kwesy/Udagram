@@ -1,4 +1,5 @@
 import express from 'express';
+import {Request , Response} from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -27,19 +28,20 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-  app.get('/filteredimage',(req, res) => {
-    let {image_url} = req.query;
+  app.get('/filteredimage',async (req : Request, res : Response) => {
+    let {image_url}: any = req.query;
+    console.log(image_url)
 
     if (image_url){
       filterImageFromURL(image_url).then((filtered_img)=>{
         res.sendFile(filtered_img);
+        
         res.on('finish', ()=>deleteLocalFiles([filtered_img]))
-      }).catch((e) => res.status(400).send('image_url parameter is missing. Can\'t process this request'))
+      }).catch((e) => res.status(422).send(e))
       return;
     } else {
       res.status(400).send('image_url parameter is missing. Can\'t process this request')
     }
-
   });
 
 
